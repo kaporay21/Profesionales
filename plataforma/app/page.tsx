@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Search, MapPin, ShieldCheck, Clock, MessageCircle, ArrowRight, Star, Building2, ChevronDown, Briefcase } from "lucide-react";
 
 // Base de datos simulada para los selectores en cascada
@@ -41,14 +42,16 @@ export default function Home() {
       
       {/* Navegación Superior */}
       <header className="flex items-center justify-between px-6 py-4 bg-white/80 backdrop-blur-md border-b border-slate-100 sticky top-0 z-50">
-        <div className="text-2xl font-black tracking-tighter text-slate-900">
+        <Link href="/" className="text-2xl font-black tracking-tighter text-slate-900">
           Directorio<span className="text-blue-600">Pro</span>
-        </div>
+        </Link>
         <nav className="hidden md:flex gap-4 items-center">
-          <button className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">Soy Profesional</button>
-          <button className="text-sm font-bold bg-slate-900 text-white px-5 py-2.5 rounded-lg hover:bg-slate-800 transition-colors shadow-sm">
+          <Link href="/login" className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">
+            Soy Profesional
+          </Link>
+          <Link href="/login" className="text-sm font-bold bg-slate-900 text-white px-5 py-2.5 rounded-lg hover:bg-slate-800 transition-colors shadow-sm">
             Iniciar Sesión
-          </button>
+          </Link>
         </nav>
       </header>
 
@@ -178,10 +181,14 @@ export default function Home() {
               </div>
 
               {/* Botón Buscar */}
-              <button className="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-600/20 transition-all flex items-center justify-center gap-2">
+              <Link href="/buscar" className="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-600/20 transition-all flex items-center justify-center gap-2">
                 Buscar
-              </button>
+              </Link>
             </div>
+            
+            <p className="text-sm text-slate-500 mt-4 font-medium flex items-center gap-1">
+              <Star className="w-4 h-4 text-amber-400 fill-amber-400" /> Más de 1,000 profesionales ya están registrados.
+            </p>
           </div>
         </section>
 
@@ -225,14 +232,14 @@ export default function Home() {
                 <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Explora por especialidad</h2>
                 <p className="text-slate-600 text-lg">Miles de expertos están listos para ayudarte en tu ciudad.</p>
               </div>
-              <button className="hidden md:flex items-center text-blue-600 font-bold hover:text-blue-800 transition-colors">
+              <Link href="/buscar" className="hidden md:flex items-center text-blue-600 font-bold hover:text-blue-800 transition-colors">
                 Ver todas las profesiones <ArrowRight className="w-5 h-5 ml-2" />
-              </button>
+              </Link>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               
-              <div className="group relative h-[350px] rounded-2xl overflow-hidden shadow-md cursor-pointer">
+              <Link href="/buscar" className="group relative h-[350px] rounded-2xl overflow-hidden shadow-md cursor-pointer block">
                 <img src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&w=600&q=80" alt="Abogados" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent"></div>
                 <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col justify-end h-full">
@@ -240,9 +247,9 @@ export default function Home() {
                   <p className="text-slate-200 text-sm mb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">Asesoramiento legal, penal, laboral y civil. Protege tus derechos hoy.</p>
                   <span className="inline-flex items-center text-blue-400 font-bold text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">Explorar especialistas <ArrowRight className="w-4 h-4 ml-1" /></span>
                 </div>
-              </div>
+              </Link>
 
-              <div className="group relative h-[350px] rounded-2xl overflow-hidden shadow-md cursor-pointer">
+              <Link href="/buscar" className="group relative h-[350px] rounded-2xl overflow-hidden shadow-md cursor-pointer block">
                 <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=600&q=80" alt="Contadores" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent"></div>
                 <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col justify-end h-full">
@@ -250,9 +257,9 @@ export default function Home() {
                   <p className="text-slate-200 text-sm mb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">Impuestos, balances y asesoría financiera integral para tu negocio.</p>
                   <span className="inline-flex items-center text-blue-400 font-bold text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">Explorar especialistas <ArrowRight className="w-4 h-4 ml-1" /></span>
                 </div>
-              </div>
+              </Link>
 
-              <div className="group relative h-[350px] rounded-2xl overflow-hidden shadow-md cursor-pointer">
+              <Link href="/buscar" className="group relative h-[350px] rounded-2xl overflow-hidden shadow-md cursor-pointer block">
                 <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=600&q=80" alt="Médicos" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent"></div>
                 <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col justify-end h-full">
@@ -260,9 +267,9 @@ export default function Home() {
                   <p className="text-slate-200 text-sm mb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">Pediatras, clínicos y especialistas en salud para cuidar de ti y tu familia.</p>
                   <span className="inline-flex items-center text-blue-400 font-bold text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">Explorar especialistas <ArrowRight className="w-4 h-4 ml-1" /></span>
                 </div>
-              </div>
+              </Link>
 
-              <div className="group relative h-[350px] rounded-2xl overflow-hidden shadow-md cursor-pointer">
+              <Link href="/buscar" className="group relative h-[350px] rounded-2xl overflow-hidden shadow-md cursor-pointer block">
                 <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=600&q=80" alt="Arquitectos" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent"></div>
                 <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col justify-end h-full">
@@ -270,13 +277,13 @@ export default function Home() {
                   <p className="text-slate-200 text-sm mb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">Diseño, planos, refacciones y dirección de obra para tu próximo proyecto.</p>
                   <span className="inline-flex items-center text-blue-400 font-bold text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">Explorar especialistas <ArrowRight className="w-4 h-4 ml-1" /></span>
                 </div>
-              </div>
+              </Link>
 
             </div>
             
-            <button className="mt-8 w-full md:hidden py-4 border-2 border-slate-200 rounded-xl text-slate-700 font-bold flex items-center justify-center hover:bg-slate-50 transition-colors">
+            <Link href="/buscar" className="mt-8 w-full md:hidden py-4 border-2 border-slate-200 rounded-xl text-slate-700 font-bold flex items-center justify-center hover:bg-slate-50 transition-colors">
               Ver todas las profesiones <ArrowRight className="w-5 h-5 ml-2" />
-            </button>
+            </Link>
           </div>
         </section>
 
@@ -290,9 +297,9 @@ export default function Home() {
             <p className="text-xl text-slate-300 mb-10 leading-relaxed">
               Únete a nuestra red, aumenta tu visibilidad y recibe consultas directamente en tu WhatsApp. Gestiona tus turnos de forma inteligente.
             </p>
-            <button className="bg-blue-600 text-white px-10 py-5 rounded-xl font-bold text-lg hover:bg-blue-500 hover:scale-105 transition-all duration-300 shadow-[0_0_40px_-10px_rgba(37,99,235,0.5)]">
+            <Link href="/login?modo=registro" className="inline-block bg-blue-600 text-white px-10 py-5 rounded-xl font-bold text-lg hover:bg-blue-500 hover:scale-105 transition-all duration-300 shadow-[0_0_40px_-10px_rgba(37,99,235,0.5)]">
               Regístrate gratis
-            </button>
+            </Link>
           </div>
         </section>
 
