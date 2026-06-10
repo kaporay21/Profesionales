@@ -1,3 +1,8 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase"; // Asegúrate de que la ruta sea correcta
 import { 
   LayoutDashboard, 
   User, 
@@ -11,7 +16,7 @@ import {
   Clock,
   LogOut,
   Lock,
-  Link,
+  Link as LinkIcon,
   ChevronRight,
   Activity,
   CalendarPlus,
@@ -19,7 +24,7 @@ import {
   StickyNote
 } from "lucide-react";
 
-// Datos simulados para el dashboard
+// Datos simulados para los turnos (esto lo conectaremos a la base de datos más adelante)
 const mockAppointments = [
   { id: 1, client: "Juan Pérez", service: "Consulta por Alta en ARCA", time: "10:00 AM", status: "Confirmado", isNew: false, avatar: "J" },
   { id: 2, client: "María Gómez", service: "Liquidación Ingresos Brutos", time: "11:30 AM", status: "Confirmado", isNew: false, avatar: "M" },
@@ -27,6 +32,62 @@ const mockAppointments = [
 ];
 
 export default function DashboardProfesional() {
+  const router = useRouter();
+  
+  // Estados para guardar los datos reales de la base de datos
+  const [perfil, setPerfil] = useState<any>(null);
+  const [cargando, setCargando] = useState(true);
+
+  // Efecto que se ejecuta al cargar la pantalla
+  useEffect(() => {
+    async function cargarDatos() {
+      try {
+        // 1. Verificamos que el usuario tenga la sesión iniciada
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          router.push("/login");
+          return;
+        }
+
+        // 2. Buscamos el último perfil registrado en la tabla profesionales
+        const { data, error } = await supabase
+          .from('profesionales')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+
+        if (error) throw error;
+        
+        if (data) {
+          setPerfil(data);
+        }
+
+      } catch (error) {
+        console.error("Error al cargar los datos:", error);
+      } finally {
+        setCargando(false);
+      }
+    }
+
+    cargarDatos();
+  }, [router]);
+
+  // Función para cerrar sesión de forma segura
+  const handleCerrarSesion = async () => {
+    await supabase.auth.signOut();
+    router.push("/login");
+  };
+
+  // Pantalla de carga mientras trae los datos de Supabase
+  if (cargando) {
+    return (
+      <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#f8fafc] flex flex-col md:flex-row font-sans selection:bg-blue-200">
       
@@ -37,26 +98,24 @@ export default function DashboardProfesional() {
         <div className="p-6 md:p-8">
           <div className="text-2xl font-black tracking-tighter text-white flex items-center gap-2">
             <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20">
-              <span className="text-white text-lg leading-none">D</span>
+              <span className="text-white text-lg leading-none">N</span>
             </div>
-            Directorio<span className="text-blue-500">Pro</span>
+            Nexo<span className="text-blue-500">Profesional</span>
           </div>
         </div>
 
-        {/* Perfil Rápido */}
+        {/* Perfil Rápido Dinámico */}
         <div className="px-6 mb-8">
           <div className="bg-slate-900/50 p-4 rounded-2xl border border-slate-800/50 flex items-center gap-4 hover:border-slate-700 transition-colors cursor-pointer">
-            <img 
-              src="https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=100&q=80" 
-              alt="Logo Nexo" 
-              className="w-12 h-12 rounded-xl object-cover border-2 border-slate-700 shadow-sm" 
-            />
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-700 to-slate-800 border-2 border-slate-700 shadow-sm flex items-center justify-center text-white font-bold text-xl uppercase">
+              {perfil?.nombre?.charAt(0) || "N"}
+            </div>
             <div className="flex-1 min-w-0">
               <h3 className="text-sm font-bold text-white truncate flex items-center gap-1.5">
-                NEXO
+                {perfil?.nombre || "NEXO"}
                 <span title="Perfil Verificado" className="flex items-center"><ShieldCheck className="w-3.5 h-3.5 text-blue-400" /></span>
               </h3>
-              <p className="text-xs text-slate-400 truncate">Estudio Contable</p>
+              <p className="text-xs text-slate-400 truncate">{perfil?.profesion || "Profesional"}</p>
             </div>
           </div>
         </div>
@@ -82,7 +141,6 @@ export default function DashboardProfesional() {
             <MessageSquare className="w-5 h-5" /> Mensajes
           </button>
 
-          {/* NUEVO: Botón de Notas y Recordatorios */}
           <button className="w-full flex items-center gap-3 hover:bg-slate-900 text-slate-400 hover:text-white px-4 py-3 rounded-xl transition-all border-l-2 border-transparent group">
             <StickyNote className="w-5 h-5 group-hover:text-amber-400 transition-colors" /> Notas y Recordatorios
           </button>
@@ -94,7 +152,7 @@ export default function DashboardProfesional() {
 
         {/* Botón Salir */}
         <div className="p-4 m-4 bg-slate-900/50 rounded-2xl border border-slate-800">
-          <button className="w-full flex items-center justify-center gap-2 text-slate-400 hover:text-white px-4 py-2 rounded-xl text-sm font-semibold transition-colors">
+          <button onClick={handleCerrarSesion} className="w-full flex items-center justify-center gap-2 text-slate-400 hover:text-white px-4 py-2 rounded-xl text-sm font-semibold transition-colors">
             <LogOut className="w-4 h-4" /> Cerrar Sesión
           </button>
         </div>
@@ -106,7 +164,7 @@ export default function DashboardProfesional() {
         {/* Topbar Glassmorphism */}
         <header className="bg-white/70 backdrop-blur-xl border-b border-slate-200/50 py-3 px-6 md:px-8 flex items-center justify-between sticky top-0 z-10">
           <div className="md:hidden text-xl font-black tracking-tighter text-slate-900">
-            D<span className="text-blue-600">Pro</span>
+            Nexo<span className="text-blue-600">Profesional</span>
           </div>
           
           <div className="hidden md:flex flex-col">
@@ -128,11 +186,12 @@ export default function DashboardProfesional() {
         {/* Contenido Principal */}
         <div className="p-6 md:p-8 max-w-6xl mx-auto w-full space-y-8">
           
-          {/* Bienvenida y Widget de Completitud */}
-          <div className="flex flex-col lg:flex-row gap-6 justify-between items-start lg:items-center">
+          {/* Bienvenida y Widget de Completitud Dinámicos */}
+          <div className="flex flex-col lg:flex-row gap-6 justify-between items-start lg:items-center animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div>
-              <h2 className="text-3xl font-extrabold text-slate-900 mb-2">¡Hola, equipo de NEXO! 👋</h2>
-              <p className="text-slate-500 text-lg">Aquí está el rendimiento de tu estudio en la plataforma.</p>
+              {/* AQUÍ SE INYECTA EL NOMBRE REAL DE LA BASE DE DATOS */}
+              <h2 className="text-3xl font-extrabold text-slate-900 mb-2">¡Hola, {perfil?.nombre?.split(' ')[0] || "equipo"}! 👋</h2>
+              <p className="text-slate-500 text-lg">Aquí está el rendimiento de tu estudio en {perfil?.localidad || "la plataforma"}.</p>
             </div>
             
             {/* Widget de Gamificación */}
@@ -147,14 +206,14 @@ export default function DashboardProfesional() {
               <div>
                 <h4 className="text-sm font-bold text-slate-900">Tu perfil está casi listo</h4>
                 <button className="text-xs font-semibold text-blue-600 hover:underline flex items-center gap-1 mt-0.5">
-                  <Link className="w-3 h-3" /> Vincular Instagram (+25%)
+                  <LinkIcon className="w-3 h-3" /> Vincular Instagram (+25%)
                 </button>
               </div>
             </div>
           </div>
 
           {/* Tarjetas de Métricas (KPIs) con Gráficos Simulados */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150">
             
             {/* KPI 1 */}
             <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300 group">
@@ -226,7 +285,7 @@ export default function DashboardProfesional() {
           </div>
 
           {/* Sección de Turnos con Tabla Mejorada */}
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
             <div className="p-6 md:p-8 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50/50">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-blue-100 text-blue-600 rounded-xl">

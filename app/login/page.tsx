@@ -2,16 +2,53 @@
 
 import { useState, Suspense } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { Mail, Lock, User, Briefcase, ArrowRight, ChevronLeft, ShieldCheck } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { supabase } from "../../lib/supabase";// Conexión a tu base de datos
+import { Mail, Lock, User, Briefcase, ArrowRight, ChevronLeft, ShieldCheck, AlertCircle } from "lucide-react";
 
 // Separamos el contenido en un componente para que Next.js pueda leer la URL correctamente
 function LoginContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const modo = searchParams.get("modo");
   
-  // Si en la URL dice "?modo=registro", isLogin arranca en FALSO (o sea, abre crear cuenta). Si no, arranca en TRUE.
+  // Estados para la interfaz
   const [isLogin, setIsLogin] = useState(modo !== "registro");
+  
+  // Estados para la lógica de Supabase
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [cargando, setCargando] = useState(false);
+  const [errorMensaje, setErrorMensaje] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCargando(true);
+    setErrorMensaje("");
+
+    if (isLogin) {
+      // LÓGICA DE LOGIN REAL CON SUPABASE
+      try {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: email,
+          password: password,
+        });
+
+        if (error) throw error;
+
+        // Si es correcto, lo enviamos al panel
+        router.push("/dashboard"); 
+      } catch (error: any) {
+        console.error("Error al iniciar sesión:", error.message);
+        setErrorMensaje("Correo o contraseña incorrectos. Inténtalo de nuevo.");
+      } finally {
+        setCargando(false);
+      }
+    } else {
+      // Si están en modo registro, los enviamos a la página completa de registro que creamos
+      router.push("/registro");
+    }
+  };
 
   return (
     <div className="min-h-screen flex text-slate-900 font-sans selection:bg-blue-200 w-full">
@@ -30,7 +67,7 @@ function LoginContent() {
           
           <div className="mb-10">
             <Link href="/" className="text-3xl font-black tracking-tighter text-slate-900 mb-8 block">
-              Directorio<span className="text-blue-600">Pro</span>
+              Nexo<span className="text-blue-600">Profesional</span>
             </Link>
             <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-3">
               {isLogin ? "Bienvenido de nuevo" : "Crea tu cuenta profesional"}
@@ -42,8 +79,17 @@ function LoginContent() {
             </p>
           </div>
 
-          <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
+          {/* MENSAJE DE ERROR */}
+          {errorMensaje && (
+            <div className="mb-6 p-4 rounded-xl flex items-start gap-3 bg-red-50 text-red-800 border border-red-200 animate-in fade-in">
+              <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
+              <p className="font-medium text-sm">{errorMensaje}</p>
+            </div>
+          )}
+
+          <form className="space-y-5" onSubmit={handleSubmit}>
             
+            {/* Solo mostramos Nombre y Profesión si es visualmente el registro */}
             {!isLogin && (
               <div className="flex flex-col sm:flex-row gap-5 animate-in fade-in slide-in-from-bottom-2 duration-500">
                 <div className="flex-1">
@@ -67,7 +113,14 @@ function LoginContent() {
               <label className="block text-sm font-bold text-slate-700 mb-1.5">Correo Electrónico</label>
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                <input type="email" placeholder="contacto@tuempresa.com" className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-12 pr-4 py-3.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all font-medium" />
+                <input 
+                  type="email" 
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="contacto@tuempresa.com" 
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-12 pr-4 py-3.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all font-medium" 
+                />
               </div>
             </div>
 
@@ -78,14 +131,26 @@ function LoginContent() {
               </div>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                <input type="password" placeholder="••••••••" className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-12 pr-4 py-3.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all font-medium" />
+                <input 
+                  type="password" 
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••" 
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-12 pr-4 py-3.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all font-medium" 
+                />
               </div>
             </div>
 
             <div className="pt-2 animate-in fade-in slide-in-from-bottom-2 duration-500 delay-200">
-              <Link href="/dashboard" className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-600/20 transition-all flex items-center justify-center gap-2">
-                {isLogin ? "Iniciar Sesión" : "Crear Cuenta y Continuar"} <ArrowRight className="w-5 h-5" />
-              </Link>
+              <button 
+                type="submit" 
+                disabled={cargando}
+                className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-600/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {cargando ? "Procesando..." : isLogin ? "Iniciar Sesión" : "Crear Cuenta y Continuar"} 
+                <ArrowRight className="w-5 h-5" />
+              </button>
             </div>
           </form>
 

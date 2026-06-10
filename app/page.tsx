@@ -4,38 +4,50 @@ import { useState } from "react";
 import Link from "next/link";
 import { Search, MapPin, ShieldCheck, Clock, MessageCircle, ArrowRight, Star, Building2, ChevronDown, Briefcase } from "lucide-react";
 
-// Base de datos simulada para los selectores en cascada
-const locationData = {
-  nacional: {
-    name: "🌎 Nivel Nacional (Online)",
-    cities: []
-  },
-  tucuman: {
-    name: "Tucumán",
-    cities: [
-      "San Miguel de Tucumán", "Yerba Buena", "Tafí Viejo", "Banda del Río Salí", 
-      "Alderetes", "Concepción", "Aguilares", "Famaillá", "Monteros", "Lules", "Tafí del Valle"
-    ]
-  },
-  salta: {
-    name: "Salta",
-    cities: ["Salta Capital", "Cafayate", "Tartagal", "San Ramón de la Nueva Orán", "Rosario de la Frontera"]
-  },
-  caba: {
-    name: "Ciudad Autónoma de Bs. As.",
-    cities: ["Palermo", "Belgrano", "Caballito", "Recoleta", "Puerto Madero", "Centro"]
-  },
-  cordoba: {
-    name: "Córdoba",
-    cities: ["Córdoba Capital", "Villa Carlos Paz", "Río Cuarto", "Alta Gracia", "Villa María"]
-  }
+// Base de datos de Provincias
+const provincias = [
+  "Nivel Nacional (Online)",
+  "Tucumán",
+  "Buenos Aires",
+  "Córdoba",
+  "Santa Fe",
+  "Salta"
+];
+
+// Base de datos estructurada de Categorías y Especialidades
+const categoriasData: Record<string, string[]> = {
+  "Salud y Bienestar": [
+    "Médico Clínico", "Pediatra", "Oncólogo", "Cirujano", "Traumatólogo", "Dentista", 
+    "Enfermería", "Kinesiología y Fisioterapia", "Nutrición", "Psicología", 
+    "Farmacia y Bioquímica", "Fonoaudiología", "Obstetricia", "Diagnóstico por Imágenes"
+  ],
+  "Ciencias Económicas": [
+    "Contador Público", "Lic. en Economía", "Lic. en Recursos Humanos", 
+    "Lic. en Comercialización", "Lic. en Administración de Empresas", 
+    "Actuario", "Comercio Exterior"
+  ],
+  "Derecho y Ciencias Jurídicas": [
+    "Abogado", "Escribano / Notario", "Procurador", "Mediador", 
+    "Criminalística y Criminología", "Derecho Informático"
+  ],
+  "Arquitectura y Diseño": [
+    "Arquitecto", "Ingeniero Civil", "Diseño Industrial", 
+    "Diseño Gráfico y Multimedia", "Agrimensura", "Ingeniería Ambiental / Seguridad e Higiene"
+  ],
+  "Tecnología e Innovación": [
+    "Ingeniería en Sistemas / Informática", "Programador / Desarrollador", 
+    "Ciencia de Datos", "Ciberseguridad", "Diseño UX/UI", 
+    "Ingeniería Electrónica", "Ingeniería en Energía", "Inteligencia Artificial"
+  ]
 };
 
 export default function Home() {
-  const [provincia, setProvincia] = useState("tucuman");
-  
-  // Obtenemos las ciudades de la provincia seleccionada
-  const ciudadesDisponibles = locationData[provincia as keyof typeof locationData]?.cities || [];
+  const [provincia, setProvincia] = useState("Tucumán");
+  const [categoria, setCategoria] = useState("");
+  const [especialidad, setEspecialidad] = useState("");
+
+  // Obtenemos las especialidades según la categoría seleccionada
+  const especialidadesDisponibles = categoriasData[categoria] || [];
 
   return (
     <div className="min-h-screen bg-white text-slate-900 selection:bg-blue-200 font-sans">
@@ -43,7 +55,7 @@ export default function Home() {
       {/* Navegación Superior */}
       <header className="flex items-center justify-between px-6 py-4 bg-white/80 backdrop-blur-md border-b border-slate-100 sticky top-0 z-50">
         <Link href="/" className="text-2xl font-black tracking-tighter text-slate-900">
-          Directorio<span className="text-blue-600">Pro</span>
+          Nexo<span className="text-blue-600">Profesional</span>
         </Link>
         <nav className="hidden md:flex gap-4 items-center">
           <Link href="/login" className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">
@@ -57,10 +69,19 @@ export default function Home() {
 
       <main>
         {/* 1. SECCIÓN HERO (Principal) */}
-        <section className="relative flex flex-col items-center justify-center px-4 pt-28 pb-24 text-center overflow-hidden">
+        <section className="relative flex flex-col items-center justify-center px-4 pt-28 pb-24 text-center overflow-hidden min-h-[600px]">
           
           <div className="absolute inset-0 bg-slate-50 -z-20"></div>
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-50 -z-10"></div>
+          
+          {/* Imágenes laterales semi-transparentes decorativas */}
+          <div className="hidden lg:block absolute left-10 top-20 w-72 h-96 rounded-2xl overflow-hidden opacity-15 rotate-3 shadow-xl -z-10">
+            <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=500&q=80" alt="Profesional de la salud" className="w-full h-full object-cover" />
+          </div>
+          <div className="hidden lg:block absolute right-10 top-20 w-72 h-96 rounded-2xl overflow-hidden opacity-15 -rotate-3 shadow-xl -z-10">
+            <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=500&q=80" alt="Oficina o asesoramiento" className="w-full h-full object-cover" />
+          </div>
+
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-blue-200/40 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
 
           <div className="relative z-10 flex flex-col items-center w-full max-w-6xl">
@@ -73,9 +94,9 @@ export default function Home() {
               Primera consulta totalmente gratis desde la web
             </div>
 
-            {/* Titular */}
+            {/* Titular directo, corto y optimizado */}
             <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-slate-900 mb-6 max-w-4xl leading-[1.15]">
-              Los mejores profesionales de tu zona, <br className="hidden md:block"/>
+              Los mejores profesionales <br className="hidden md:block"/>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-500">
                 al alcance de un click.
               </span>
@@ -85,7 +106,7 @@ export default function Home() {
               Encuentra expertos validados, chatea al instante por WhatsApp y reserva tu turno online. Sin intermediarios, rápido y seguro.
             </p>
 
-            {/* Prueba Social (Avatares superpuestos) */}
+            {/* Prueba Social */}
             <div className="flex flex-col sm:flex-row items-center gap-4 mb-10 bg-white/60 px-6 py-3 rounded-full border border-slate-200 shadow-sm backdrop-blur-md">
               <div className="flex -space-x-3">
                 <img className="w-10 h-10 rounded-full border-2 border-white object-cover shadow-sm" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" alt="Usuario" />
@@ -107,43 +128,47 @@ export default function Home() {
               </div>
             </div>
 
-            {/* BARRA DE BÚSQUEDA INTERACTIVA (100% ESTRICTA CON ETIQUETAS) */}
+            {/* Buscador en Cascada: Categoría -> Especialidad -> Provincia */}
             <div className="w-full bg-white/95 backdrop-blur-xl p-2.5 rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] border border-slate-200/80 flex flex-col md:flex-row gap-2 transition-transform hover:-translate-y-1 duration-300">
               
-              {/* 1. Profesión / Especialidad */}
-              <div className="flex-[1.5] flex items-center px-4 py-3 bg-slate-50 hover:bg-slate-100 rounded-xl border border-transparent focus-within:border-blue-500 focus-within:bg-white transition-all cursor-pointer relative group">
+              {/* 1. Categoría de Profesionales */}
+              <div className="flex-1 flex items-center px-4 py-3 bg-slate-50 hover:bg-slate-100 rounded-xl border border-transparent focus-within:border-blue-500 focus-within:bg-white transition-all cursor-pointer relative group">
                 <Briefcase className="w-5 h-5 text-slate-400 mr-3 flex-shrink-0" />
-                <select defaultValue="" className="w-full bg-transparent outline-none text-slate-700 font-medium appearance-none cursor-pointer">
-                  <option value="" disabled>¿Qué especialista buscas?</option>
-                  
-                  <optgroup label="Ciencias Económicas">
-                    <option value="contadores">Contadores Públicos</option>
-                    <option value="impuestos">Asesoría Fiscal (ARCA / DGR)</option>
-                    <option value="monotributo">Monotributo y Pymes</option>
-                  </optgroup>
-
-                  <optgroup label="Legales">
-                    <option value="abogados_laborales">Abogados Laborales</option>
-                    <option value="abogados_penales">Abogados Penales</option>
-                    <option value="escribanos">Escribanos</option>
-                  </optgroup>
-                  
-                  <optgroup label="Salud y Bienestar">
-                    <option value="medicos">Médicos Clínicos</option>
-                    <option value="psicologos">Psicólogos</option>
-                    <option value="odontologos">Odontólogos</option>
-                  </optgroup>
-
-                  <optgroup label="Arquitectura y Diseño">
-                    <option value="arquitectos">Arquitectos</option>
-                    <option value="ingenieros">Ingenieros</option>
-                    <option value="disenadores">Diseñadores Gráficos</option>
-                  </optgroup>
+                <select 
+                  value={categoria} 
+                  onChange={(e) => {
+                    setCategoria(e.target.value);
+                    setEspecialidad(""); 
+                  }}
+                  className="w-full bg-transparent outline-none text-slate-700 font-medium appearance-none cursor-pointer"
+                >
+                  <option value="" disabled>Selecciona categoría...</option>
+                  {Object.keys(categoriasData).map((cat) => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
                 </select>
                 <ChevronDown className="w-5 h-5 text-slate-400 absolute right-4 pointer-events-none group-hover:text-blue-500 transition-colors" />
               </div>
 
-              {/* 2. Provincia */}
+              {/* 2. Especialidad (Dinámico) */}
+              <div className={`flex-1 flex items-center px-4 py-3 rounded-xl border border-transparent transition-all cursor-pointer relative group
+                ${!categoria ? 'bg-slate-100 opacity-60 cursor-not-allowed' : 'bg-slate-50 hover:bg-slate-100 focus-within:border-blue-500 focus-within:bg-white'}`}>
+                <Search className="w-5 h-5 text-slate-400 mr-3 flex-shrink-0" />
+                <select 
+                  value={especialidad}
+                  onChange={(e) => setEspecialidad(e.target.value)}
+                  disabled={!categoria}
+                  className="w-full bg-transparent outline-none text-slate-700 font-medium appearance-none cursor-pointer disabled:cursor-not-allowed"
+                >
+                  <option value="">Todas las especialidades</option>
+                  {especialidadesDisponibles.map((esp) => (
+                    <option key={esp} value={esp}>{esp}</option>
+                  ))}
+                </select>
+                <ChevronDown className="w-5 h-5 text-slate-400 absolute right-4 pointer-events-none group-hover:text-blue-500 transition-colors" />
+              </div>
+
+              {/* 3. Provincia */}
               <div className="flex-1 flex items-center px-4 py-3 bg-slate-50 hover:bg-slate-100 rounded-xl border border-transparent focus-within:border-blue-500 focus-within:bg-white transition-all cursor-pointer relative group">
                 <MapPin className="w-5 h-5 text-slate-400 mr-3 flex-shrink-0" />
                 <select 
@@ -151,37 +176,15 @@ export default function Home() {
                   onChange={(e) => setProvincia(e.target.value)}
                   className="w-full bg-transparent outline-none text-slate-700 font-medium appearance-none cursor-pointer"
                 >
-                  {Object.entries(locationData).map(([key, data]) => (
-                    <option key={key} value={key}>{data.name}</option>
+                  {provincias.map((prov) => (
+                    <option key={prov} value={prov}>{prov}</option>
                   ))}
                 </select>
                 <ChevronDown className="w-5 h-5 text-slate-400 absolute right-4 pointer-events-none group-hover:text-blue-500 transition-colors" />
               </div>
 
-              {/* 3. Localidad (Se actualiza según la provincia) */}
-              <div className={`flex-1 flex items-center px-4 py-3 rounded-xl border border-transparent transition-all cursor-pointer relative group
-                ${provincia === 'nacional' ? 'bg-slate-100 opacity-50 cursor-not-allowed' : 'bg-slate-50 hover:bg-slate-100 focus-within:border-blue-500 focus-within:bg-white'}`}>
-                <Building2 className="w-5 h-5 text-slate-400 mr-3 flex-shrink-0" />
-                <select 
-                  disabled={provincia === 'nacional'}
-                  className="w-full bg-transparent outline-none text-slate-700 font-medium appearance-none cursor-pointer disabled:cursor-not-allowed"
-                >
-                  {provincia === 'nacional' ? (
-                    <option value="">Atención Remota</option>
-                  ) : (
-                    <>
-                      <option value="todas" className="font-bold">Toda la provincia</option>
-                      {ciudadesDisponibles.map((ciudad) => (
-                        <option key={ciudad} value={ciudad}>{ciudad}</option>
-                      ))}
-                    </>
-                  )}
-                </select>
-                <ChevronDown className="w-5 h-5 text-slate-400 absolute right-4 pointer-events-none group-hover:text-blue-500 transition-colors" />
-              </div>
-
               {/* Botón Buscar */}
-              <Link href="/buscar" className="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-600/20 transition-all flex items-center justify-center gap-2">
+              <Link href={`/buscar?provincia=${provincia}&categoria=${categoria}&especialidad=${especialidad}`} className="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-600/20 transition-all flex items-center justify-center gap-2">
                 Buscar
               </Link>
             </div>
@@ -243,8 +246,8 @@ export default function Home() {
                 <img src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&w=600&q=80" alt="Abogados" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent"></div>
                 <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col justify-end h-full">
-                  <h3 className="text-2xl font-bold text-white mb-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Abogados</h3>
-                  <p className="text-slate-200 text-sm mb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">Asesoramiento legal, penal, laboral y civil. Protege tus derechos hoy.</p>
+                  <h3 className="text-2xl font-bold text-white mb-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Legales</h3>
+                  <p className="text-slate-200 text-sm mb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">Asesoramiento legal, penal, laboral y civil. Protege tus derechos.</p>
                   <span className="inline-flex items-center text-blue-400 font-bold text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">Explorar especialistas <ArrowRight className="w-4 h-4 ml-1" /></span>
                 </div>
               </Link>
@@ -253,7 +256,7 @@ export default function Home() {
                 <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=600&q=80" alt="Contadores" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent"></div>
                 <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col justify-end h-full">
-                  <h3 className="text-2xl font-bold text-white mb-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Contadores</h3>
+                  <h3 className="text-2xl font-bold text-white mb-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Económicas</h3>
                   <p className="text-slate-200 text-sm mb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">Impuestos, balances y asesoría financiera integral para tu negocio.</p>
                   <span className="inline-flex items-center text-blue-400 font-bold text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">Explorar especialistas <ArrowRight className="w-4 h-4 ml-1" /></span>
                 </div>
@@ -263,7 +266,7 @@ export default function Home() {
                 <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=600&q=80" alt="Médicos" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent"></div>
                 <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col justify-end h-full">
-                  <h3 className="text-2xl font-bold text-white mb-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Médicos</h3>
+                  <h3 className="text-2xl font-bold text-white mb-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Salud</h3>
                   <p className="text-slate-200 text-sm mb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">Pediatras, clínicos y especialistas en salud para cuidar de ti y tu familia.</p>
                   <span className="inline-flex items-center text-blue-400 font-bold text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">Explorar especialistas <ArrowRight className="w-4 h-4 ml-1" /></span>
                 </div>
@@ -273,7 +276,7 @@ export default function Home() {
                 <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=600&q=80" alt="Arquitectos" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent"></div>
                 <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col justify-end h-full">
-                  <h3 className="text-2xl font-bold text-white mb-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Arquitectos</h3>
+                  <h3 className="text-2xl font-bold text-white mb-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Arquitectura</h3>
                   <p className="text-slate-200 text-sm mb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">Diseño, planos, refacciones y dirección de obra para tu próximo proyecto.</p>
                   <span className="inline-flex items-center text-blue-400 font-bold text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">Explorar especialistas <ArrowRight className="w-4 h-4 ml-1" /></span>
                 </div>
